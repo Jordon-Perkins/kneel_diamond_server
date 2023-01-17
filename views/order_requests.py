@@ -1,3 +1,9 @@
+from copy import deepcopy
+
+from .metal_requests import get_single_metal
+from .size_requests import get_single_size
+from .style_requests import get_single_style
+
 ORDERS = [
         {
             "id": 1,
@@ -16,13 +22,26 @@ def get_single_order(id):
     # Variable to hold the found metal, if it exists
     requested_order = None
 
-    # Iterate the METALS list above. Very similar to the
-    # for..of loops you used in JavaScript.
+
     for order in ORDERS:
-        # Dictionaries in Python use [] notation to find a key
-        # instead of the dot notation that JavaScript used.
         if order["id"] == id:
-            requested_order = order
+            requested_order = deepcopy(order)
+
+            styleId = requested_order["styleId"]
+            style = get_single_style(styleId)
+            requested_order["style"] = style
+
+            metalId = requested_order["metalId"]
+            metal = get_single_metal(metalId)
+            requested_order["metal"] = metal
+
+            sizeId = requested_order["sizeId"]
+            size = get_single_size(sizeId)
+            requested_order["size"] = size
+
+            del requested_order["styleId"]
+            del requested_order["metalId"]
+            del requested_order["sizeId"]
 
     return requested_order
 

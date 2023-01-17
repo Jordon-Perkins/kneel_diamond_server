@@ -1,6 +1,8 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from views import get_all_styles, get_all_orders, get_all_metals, get_all_sizes, get_single_style, get_single_size, get_single_metal, get_single_order, create_order, create_metal, create_size, create_style, delete_order, update_order
+from views import (get_all_styles, get_all_orders, get_all_metals, get_all_sizes, get_single_style, 
+get_single_size, get_single_metal, get_single_order, create_order, create_metal, create_size, 
+create_style, delete_order, update_order)
 
 
 class HandleRequests(BaseHTTPRequestHandler):
