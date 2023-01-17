@@ -34,7 +34,7 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Handles GET requests to the server """
-        self._set_headers(200)
+        status_code = 200
         response = {}  # Default response
 
         # Parse the URL and capture the tuple that is returned
@@ -43,25 +43,38 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "metals":
             if id is not None:
                 response = get_single_metal(id)
+                if response is None:
+                    status_code = 404
+                    response = {"message": f"{id} is currently not in stock for jewelry."}
             else: response = get_all_metals()
+
 
         elif resource == "orders":
             if id is not None:
                 response = get_single_order(id)
+                if response is None:
+                    status_code = 404
+                    response = {"message": "That order was never placed, or was cancelled."}
             else: response = get_all_orders()
 
         elif resource == "styles":
             if id is not None:
                 response = get_single_style(id)
+                if response is None:
+                    status_code = 404
+                    response = {"message": f"{id} is currently not in stock for jewelry."}
             else: response = get_all_styles()
 
         elif resource == "sizes":
             if id is not None:
                 response = get_single_size(id)
+                if response is None:
+                    status_code = 404
+                    response = {"message": f"{id} is currently not in stock for jewelry."}
             else: response = get_all_sizes()
 
         
-
+        self._set_headers(status_code)
         self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
