@@ -126,20 +126,21 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(response).encode())
 
     def do_PUT(self):
-        self._set_headers(204)
+        
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
 
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
-
-        # Delete a single animal from the list
-        if resource == "orders":
-            update_order(id, post_body)
-
+        response = {}
         
-        self.wfile.write("".encode())
+        if resource == "orders":
+            if id is not None:
+                response = { "message" : "Your order has been placed and is in production, no changes can be made at this time, Thank you!" }
+            
+        self._set_headers(405)
+        self.wfile.write(json.dumps(response).encode())
 
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
