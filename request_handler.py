@@ -78,7 +78,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
-        self._set_headers(201)
+        status_code = 201
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
@@ -94,23 +94,36 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "metals":
             new_metal = None
             new_metal = create_metal(post_body)
-            self.wfile.write(json.dumps(new_metal).encode())
+            response = new_metal
 
         elif resource == "orders":
-            new_order= None
-            new_order = create_order(post_body)
-            self.wfile.write(json.dumps(new_order).encode())
+            metal_does_exist = "metal" in post_body.keys()
+            style_does_exist = "style" in post_body.keys()
+            size_does_exist = "size" in post_body.keys()
+            if not metal_does_exist:
+                response = {"message": "metal is required"}
+                status_code = 400
+            elif not style_does_exist:
+                response = {"message": "style is required"}
+                status_code = 400
+            elif not size_does_exist:
+                response ={"message": "size is required"}
+                status_code = 400
+            else:
+                response = create_order(post_body)
 
         elif resource == "styles":
             new_style= None
             new_style = create_style(post_body)
-            self.wfile.write(json.dumps(new_style).encode())
+            response = new_style
 
         elif resource == "sizes":
             new_size= None
             new_size = create_size(post_body)
-            self.wfile.write(json.dumps(new_size).encode())
+            response = new_size
 
+        self._set_headers(status_code)
+        self.wfile.write(json.dumps(response).encode())
 
     def do_PUT(self):
         self._set_headers(204)
