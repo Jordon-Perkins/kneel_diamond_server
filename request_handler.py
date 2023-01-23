@@ -97,17 +97,17 @@ class HandleRequests(BaseHTTPRequestHandler):
             response = new_metal
 
         elif resource == "orders":
-            metal_does_exist = "metal" in post_body.keys()
-            style_does_exist = "style" in post_body.keys()
-            size_does_exist = "size" in post_body.keys()
+            metal_does_exist = "metal_id" in post_body.keys()
+            style_does_exist = "style_id" in post_body.keys()
+            size_does_exist = "size_id" in post_body.keys()
             if not metal_does_exist:
-                response = {"message": "metal is required"}
+                response = {"message": "metal_id is required"}
                 status_code = 400
             elif not style_does_exist:
-                response = {"message": "style is required"}
+                response = {"message": "style_id is required"}
                 status_code = 400
             elif not size_does_exist:
-                response ={"message": "size is required"}
+                response ={"message": "size_id is required"}
                 status_code = 400
             else:
                 response = create_order(post_body)

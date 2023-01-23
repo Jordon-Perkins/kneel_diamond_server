@@ -3,9 +3,9 @@ import sqlite3
 import json
 from models import Order
 
-from .metal_requests import get_single_metal
-from .size_requests import get_single_size
-from .style_requests import get_single_style
+# from .metal_requests import get_single_metal
+# from .size_requests import get_single_size
+# from .style_requests import get_single_style
 
 ORDERS = [
         {
@@ -115,21 +115,45 @@ def get_single_order(id):
 #     return requested_order
 
 
-def create_order(order):
-    # Get the id value of the last animal in the list
-    max_id = ORDERS[-1]["id"]
+def create_order(new_order):
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        db_cursor = conn.cursor()
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
+        db_cursor.execute("""
+        INSERT INTO orders
+            ( size_id, metal_id, style_id, timestamp )
+        VALUES
+            ( ?, ?, ?, ?);
+        """, (new_order['size_id'], new_order['metal_id'],
+                new_order['style_id'], new_order['timestamp']))
 
-    # Add an `id` property to the animal dictionary
-    order["id"] = new_id
+        # The `lastrowid` property on the cursor will return
+        # the primary key of the last thing that got added to
+        # the database.
+        id = db_cursor.lastrowid
 
-    # Add the animal dictionary to the list
-    ORDERS.append(order)
+        # Add the `id` property to the animal dictionary that
+        # was sent by the client so that the client sees the
+        # primary key in the response.
+        new_order['id'] = id
 
-    # Return the dictionary with `id` property added
-    return order
+        return new_order
+
+# def create_order(order):
+#     # Get the id value of the last animal in the list
+#     max_id = ORDERS[-1]["id"]
+
+#     # Add 1 to whatever that number is
+#     new_id = max_id + 1
+
+#     # Add an `id` property to the animal dictionary
+#     order["id"] = new_id
+
+#     # Add the animal dictionary to the list
+#     ORDERS.append(order)
+
+#     # Return the dictionary with `id` property added
+#     return order
 
 def delete_order(id):
     # Initial -1 value for animal index, in case one isn't found
