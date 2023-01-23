@@ -57,31 +57,62 @@ def get_all_orders():
 
 # Function with a single parameter
 def get_single_order(id):
-    # Variable to hold the found metal, if it exists
-    requested_order = None
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Use a ? parameter to inject a variable's value
+        # into the SQL statement.
+        db_cursor.execute("""
+        SELECT
+            o.id,
+            o.metal_id,
+            o.size_id,
+            o.style_id,
+            o.timestamp
+        FROM orders o
+        WHERE o.id = ?
+        """, ( id, ))
+
+        # Load the single result into memory
+        data = db_cursor.fetchone()
+
+        if data is None:
+            return {}
+
+        # Create an animal instance from the current row
+        order = Order(data['id'], data['metal_id'], data['size_id'],
+                            data['style_id'], data['timestamp'])
+
+        return order.__dict__
 
 
-    for order in ORDERS:
-        if order["id"] == id:
-            requested_order = deepcopy(order)
+# def get_single_order(id):
+#     # Variable to hold the found metal, if it exists
+#     requested_order = None
 
-            styleId = requested_order["styleId"]
-            style = get_single_style(styleId)
-            requested_order["style"] = style
 
-            metalId = requested_order["metalId"]
-            metal = get_single_metal(metalId)
-            requested_order["metal"] = metal
+#     for order in ORDERS:
+#         if order["id"] == id:
+#             requested_order = deepcopy(order)
 
-            sizeId = requested_order["sizeId"]
-            size = get_single_size(sizeId)
-            requested_order["size"] = size
+#             styleId = requested_order["styleId"]
+#             style = get_single_style(styleId)
+#             requested_order["style"] = style
 
-            del requested_order["styleId"]
-            del requested_order["metalId"]
-            del requested_order["sizeId"]
+#             metalId = requested_order["metalId"]
+#             metal = get_single_metal(metalId)
+#             requested_order["metal"] = metal
 
-    return requested_order
+#             sizeId = requested_order["sizeId"]
+#             size = get_single_size(sizeId)
+#             requested_order["size"] = size
+
+#             del requested_order["styleId"]
+#             del requested_order["metalId"]
+#             del requested_order["sizeId"]
+
+#     return requested_order
 
 
 def create_order(order):
