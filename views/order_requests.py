@@ -1,7 +1,7 @@
 from copy import deepcopy
 import sqlite3
 import json
-from models import Order
+from models import Order, Metal, Style, Size
 
 # from .metal_requests import get_single_metal
 # from .size_requests import get_single_size
@@ -29,11 +29,20 @@ def get_all_orders():
         db_cursor.execute("""
         SELECT
             o.id,
-            o.metal_id,
+            o.timestamp,
             o.style_id,
+            o.metal_id,
             o.size_id,
-            o.timestamp
-        FROM orders o
+            m.metal,
+            m.price metal_price,
+            s.style,
+            s.price style_price,
+            c.carets,
+            c.price size_price
+        FROM Orders o
+        JOIN Metals m ON m.id = o.metal_id
+        JOIN Styles s ON s.id = o.style_id
+        JOIN Sizes c ON c.id = o.size_id
         """)
 
         # Initialize an empty list to hold all animal representations
@@ -49,7 +58,14 @@ def get_all_orders():
             # Note that the database fields are specified in
             # exact order of the parameters defined in the
             # Animal class above.
-            order = Order(row['id'], row['metal_id'], row["size_id"], row["style_id"], row["timestamp"])
+            order = Order(row['id'], row['timestamp'], row["style_id"], row["metal_id"], row["size_id"])
+            metal = Metal(row['metal_id'], row['metal'], row['metal_price'])
+            style = Style(row['style_id'], row['style'], row['style_price'])
+            size = Size(row['size_id'], row['carets'], row['size_price'])
+
+            order.size = size.__dict__
+            order.metal = metal.__dict__
+            order.style = style.__dict__
 
             orders.append(order.__dict__)
 
