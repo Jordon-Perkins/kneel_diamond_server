@@ -1,3 +1,8 @@
+import sqlite3
+import json
+
+from models import Metal
+
 METALS = [
         { "id": 1, "metal": "Sterling Silver", "price": 12.42 },
         { "id": 2, "metal": "14K Gold", "price": 736.4 },
@@ -40,3 +45,27 @@ def create_metal(metal):
 
     # Return the dictionary with `id` property added
     return metal
+
+
+def update_metal(id, new_metal):
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Metals
+            SET
+                metal = ?,
+                price = ?
+        WHERE id = ?
+        """, (new_metal['metal'], new_metal['price'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
+    else:
+        # Forces 204 response by main module
+        return True

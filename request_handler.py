@@ -3,7 +3,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from views import (get_all_styles, get_all_orders, get_all_metals, get_all_sizes, get_single_style, 
 get_single_size, get_single_metal, get_single_order, create_order, create_metal, create_size, 
-create_style, delete_order, update_order)
+create_style, delete_order, update_order, update_metal)
 
 
 # this helps you print stuff!
@@ -146,10 +146,17 @@ class HandleRequests(BaseHTTPRequestHandler):
         response = {}
         
         if resource == "orders":
-            if id is not None:
+            if id:
                 response = { "message" : "Your order has been placed and is in production, no changes can be made at this time, Thank you!" }
-            
-        self._set_headers(405)
+
+        elif resource == "metals":
+            response = update_metal(id, post_body)
+
+        if response:
+            self._set_headers(204)
+        else:
+            self._set_headers(404)
+
         self.wfile.write(json.dumps(response).encode())
 
     def _set_headers(self, status):
