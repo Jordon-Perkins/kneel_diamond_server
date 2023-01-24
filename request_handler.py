@@ -1,8 +1,14 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from views import (get_all_styles, get_all_orders, get_all_metals, get_all_sizes, get_single_style, 
 get_single_size, get_single_metal, get_single_order, create_order, create_metal, create_size, 
 create_style, delete_order, update_order)
+
+
+# this helps you print stuff!
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -39,6 +45,7 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # Parse the URL and capture the tuple that is returned
         (resource, id) = self.parse_url(self.path)
+        logging.debug(f"Inside the `do_GET`: {resource}, {id}")
 
         if resource == "metals":
             if id is not None:
@@ -87,6 +94,7 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
+        logging.debug(f"Inside the `do_POST`: {resource}, {id}")
 
         # Add a new animal to the list. Don't worry about
         # the orange squiggle, you'll define the create_animal
@@ -133,6 +141,8 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
+        logging.debug(f"Inside the `do_PUT`: {resource}, {id}")
+
         response = {}
         
         if resource == "orders":
@@ -170,9 +180,10 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
+        logging.debug(f"Inside the `do_DELETE`: {resource}, {id}")
 
     # Delete a single animal from the list
-        if resource == "order":
+        if resource == "orders":
             delete_order(id)
 
     # Encode the new animal and send in response

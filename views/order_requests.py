@@ -156,19 +156,14 @@ def create_order(new_order):
 #     return order
 
 def delete_order(id):
-    # Initial -1 value for animal index, in case one isn't found
-    order_index = -1
+    with sqlite3.connect("./kneel.sqlite3") as conn:
+        db_cursor = conn.cursor()
 
-    # Iterate the ANIMALS list, but use enumerate() so that you
-    # can access the index value of each item
-    for index, order in enumerate(ORDERS):
-        if order["id"] == id:
-            # Found the animal. Store the current index.
-            order_index = index
+        db_cursor.execute("""
+        DELETE FROM orders
+        WHERE id = ?
+        """, (id, ))
 
-    # If the animal was found, use pop(int) to remove it from list
-    if order_index >= 0:
-        ORDERS.pop(order_index)
 
 def update_order(id, new_order):
     # Iterate the ANIMALS list, but use enumerate() so that
